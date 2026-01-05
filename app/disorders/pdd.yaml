@@ -1,0 +1,82 @@
+id: pdd
+name: Persistent Depressive Disorder (Dysthymia)
+category: depressive_disorders
+gating:
+  age_min: 0
+interaction_requirements:
+  min_turns: 6
+  require_progress_summary: true
+  require_closure_ack: true
+
+slots:
+  depressed_mood:
+    type: boolean
+    signals: ["sad", "low", "down", "depressed"]
+  duration_years:
+    type: number
+    signals: ["years", "for a long time"]
+  appetite_change:
+    type: boolean
+    signals: ["appetite", "eating"]
+  sleep_change:
+    type: boolean
+    signals: ["sleep", "insomnia", "sleeping too much"]
+  low_energy:
+    type: boolean
+    signals: ["tired", "fatigue", "no energy"]
+  low_self_esteem:
+    type: boolean
+    signals: ["low self-esteem", "not good enough"]
+  poor_concentration:
+    type: boolean
+    signals: ["can't focus", "concentrate", "decisions"]
+  hopelessness:
+    type: boolean
+    signals: ["hopeless"]
+  symptom_free_months:
+    type: number
+    signals: ["symptom free", "break"]
+
+exclusion_slots:
+  manic_hypomanic_episode:
+    type: boolean
+    signals: ["mania", "hypomania"]
+  substance_or_medical_cause:
+    type: boolean
+    signals: ["substance", "medical"]
+
+criteria:
+  core:
+    - id: A
+      label: Depressed mood for most of the day, more days than not
+      slots_required: ["depressed_mood"]
+      rule: "depressed_mood == true"
+    - id: B
+      label: Duration 2+ years (or 1 year in children/adolescents) — simplified
+      slots_required: ["duration_years"]
+      rule: "duration_years >= 2"
+    - id: C
+      label: Two or more additional symptoms
+      slots_required: ["appetite_change","sleep_change","low_energy","low_self_esteem","poor_concentration","hopelessness"]
+      rule: "count_true([appetite_change,sleep_change,low_energy,low_self_esteem,poor_concentration,hopelessness]) >= 2"
+    - id: D
+      label: Not symptom-free for more than 2 months at a time
+      slots_required: ["symptom_free_months"]
+      rule: "symptom_free_months <= 2"
+  exclusions:
+    - id: X_mania
+      label: Manic/hypomanic episode present (rule-out)
+      slots_required: ["manic_hypomanic_episode"]
+      rule: "manic_hypomanic_episode == true"
+      effect: EXCLUDED
+    - id: X_substance_medical
+      label: Symptoms due to substance/medical condition (rule-out)
+      slots_required: ["substance_or_medical_cause"]
+      rule: "substance_or_medical_cause == true"
+      effect: EXCLUDED
+thresholds:
+  probable_min_core_met: 3
+  probable_min_coverage: 0.70
+notes:
+  template: true
+  todo: "Replace simplified thresholds with exact DSM wording from the provided PDF."

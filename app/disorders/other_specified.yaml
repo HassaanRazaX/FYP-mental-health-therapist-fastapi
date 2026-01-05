@@ -1,0 +1,29 @@
+id: other_specified
+name: Other Specified Depressive Disorder
+category: depressive_disorders
+gating:
+  age_min: 0
+interaction_requirements:
+  min_turns: 4
+  require_progress_summary: true
+  require_closure_ack: true
+
+slots:
+  depressive_symptoms_present:
+    type: boolean
+    signals: ["sad", "low", "depressed", "hopeless", "no energy"]
+  clinician_reason:
+    type: string
+    signals: ["because", "reason", "specified"]
+
+criteria:
+  core:
+    - id: A
+      label: Clinically significant depressive symptoms but not meeting full criteria elsewhere
+      slots_required: ["depressive_symptoms_present"]
+      rule: "depressive_symptoms_present == true"
+thresholds:
+  probable_min_core_met: 1
+  probable_min_coverage: 0.50
+notes:
+  template: true

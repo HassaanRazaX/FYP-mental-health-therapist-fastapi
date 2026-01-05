@@ -1,0 +1,40 @@
+id: substance_medication_induced
+name: Substance/Medication-Induced Depressive Disorder
+category: depressive_disorders
+gating:
+  age_min: 0
+interaction_requirements:
+  min_turns: 5
+  require_progress_summary: true
+  require_closure_ack: true
+
+slots:
+  depressed_mood_or_anhedonia:
+    type: boolean
+    signals: ["sad", "low", "depressed", "no pleasure"]
+  temporal_relation_to_substance:
+    type: boolean
+    signals: ["after starting", "after using", "withdrawal"]
+  substance_known_to_cause:
+    type: boolean
+    signals: ["steroids", "alcohol", "substance"]
+  symptoms_exceed_intoxication:
+    type: boolean
+    signals: ["persist", "beyond", "not just intoxication"]
+
+criteria:
+  core:
+    - id: A
+      label: Depressed mood/anhedonia present
+      slots_required: ["depressed_mood_or_anhedonia"]
+      rule: "depressed_mood_or_anhedonia == true"
+    - id: B
+      label: Evidence symptoms developed during/soon after substance use/withdrawal
+      slots_required: ["temporal_relation_to_substance"]
+      rule: "temporal_relation_to_substance == true"
+  exclusions: []
+thresholds:
+  probable_min_core_met: 2
+  probable_min_coverage: 0.66
+notes:
+  template: true

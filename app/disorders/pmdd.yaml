@@ -1,0 +1,77 @@
+id: pmdd
+name: Premenstrual Dysphoric Disorder
+category: depressive_disorders
+gating:
+  age_min: 12
+interaction_requirements:
+  min_turns: 6
+  require_progress_summary: true
+  require_closure_ack: true
+
+slots:
+  cyclical_timing:
+    type: boolean
+    signals: ["before period", "luteal", "pms", "premenstrual"]
+  symptoms_remit_after_menses:
+    type: boolean
+    signals: ["better after period", "goes away after menstruation"]
+  affect_lability:
+    type: boolean
+    signals: ["mood swings", "tearful"]
+  irritability:
+    type: boolean
+    signals: ["irritable", "angry"]
+  depressed_mood:
+    type: boolean
+    signals: ["sad", "hopeless"]
+  anxiety_tension:
+    type: boolean
+    signals: ["anxious", "on edge"]
+  decreased_interest:
+    type: boolean
+    signals: ["less interest"]
+  concentration:
+    type: boolean
+    signals: ["can't focus"]
+  fatigue:
+    type: boolean
+    signals: ["tired"]
+  appetite_change:
+    type: boolean
+    signals: ["appetite", "cravings"]
+  sleep_change:
+    type: boolean
+    signals: ["sleeping too much", "insomnia"]
+  overwhelmed:
+    type: boolean
+    signals: ["overwhelmed", "out of control"]
+  physical_symptoms:
+    type: boolean
+    signals: ["breast tenderness", "bloating", "joint pain"]
+
+exclusion_slots:
+  substance_or_medical_cause:
+    type: boolean
+    signals: ["substance", "medical"]
+
+criteria:
+  core:
+    - id: A
+      label: Symptoms in final week before menses, improve after onset
+      slots_required: ["cyclical_timing", "symptoms_remit_after_menses"]
+      rule: "cyclical_timing == true and symptoms_remit_after_menses == true"
+    - id: B
+      label: At least 5 symptoms with at least 1 core mood symptom (simplified)
+      slots_required: ["affect_lability","irritability","depressed_mood","anxiety_tension","decreased_interest","concentration","fatigue","appetite_change","sleep_change","overwhelmed","physical_symptoms"]
+      rule: "count_true([affect_lability,irritability,depressed_mood,anxiety_tension,decreased_interest,concentration,fatigue,appetite_change,sleep_change,overwhelmed,physical_symptoms]) >= 5 and count_true([affect_lability,irritability,depressed_mood,anxiety_tension]) >= 1"
+  exclusions:
+    - id: X_substance_medical
+      label: Symptoms due to substance/medical condition (rule-out)
+      slots_required: ["substance_or_medical_cause"]
+      rule: "substance_or_medical_cause == true"
+      effect: EXCLUDED
+thresholds:
+  probable_min_core_met: 2
+  probable_min_coverage: 0.70
+notes:
+  template: true

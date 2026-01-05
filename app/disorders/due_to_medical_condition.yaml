@@ -1,0 +1,37 @@
+id: due_to_medical_condition
+name: Depressive Disorder Due to Another Medical Condition
+category: depressive_disorders
+gating:
+  age_min: 0
+interaction_requirements:
+  min_turns: 5
+  require_progress_summary: true
+  require_closure_ack: true
+
+slots:
+  depressed_mood_or_anhedonia:
+    type: boolean
+    signals: ["sad", "low", "depressed", "no pleasure"]
+  medical_condition_present:
+    type: boolean
+    signals: ["thyroid", "stroke", "medical condition", "illness"]
+  causal_link_suspected:
+    type: boolean
+    signals: ["because of", "caused by", "after illness"]
+
+criteria:
+  core:
+    - id: A
+      label: Depressed mood/anhedonia
+      slots_required: ["depressed_mood_or_anhedonia"]
+      rule: "depressed_mood_or_anhedonia == true"
+    - id: B
+      label: Evidence of medical condition causing symptoms
+      slots_required: ["medical_condition_present", "causal_link_suspected"]
+      rule: "medical_condition_present == true and causal_link_suspected == true"
+  exclusions: []
+thresholds:
+  probable_min_core_met: 2
+  probable_min_coverage: 0.66
+notes:
+  template: true

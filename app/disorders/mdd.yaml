@@ -1,0 +1,85 @@
+id: mdd
+name: Major Depressive Disorder
+category: depressive_disorders
+gating:
+  age_min: 0
+interaction_requirements:
+  min_turns: 6
+  require_progress_summary: true
+  require_closure_ack: true
+
+slots:
+  depressed_mood:
+    type: boolean
+    signals: ["sad", "low", "down", "depressed"]
+  anhedonia:
+    type: boolean
+    signals: ["lost interest", "no pleasure", "nothing enjoyable"]
+  duration_weeks:
+    type: number
+    signals: ["weeks", "days", "since"]
+  appetite_weight_change:
+    type: boolean
+    signals: ["appetite", "weight", "eating more", "eating less"]
+  sleep_disturbance:
+    type: boolean
+    signals: ["insomnia", "sleepy", "sleeping too much", "can't sleep"]
+  psychomotor_change:
+    type: boolean
+    signals: ["slowed", "restless", "agitated"]
+  fatigue:
+    type: boolean
+    signals: ["tired", "no energy", "fatigue"]
+  worthlessness_guilt:
+    type: boolean
+    signals: ["worthless", "guilt", "blame myself"]
+  concentration:
+    type: boolean
+    signals: ["can't focus", "concentrate", "indecisive"]
+  suicidality:
+    type: boolean
+    signals: ["suicidal", "self-harm", "end my life"]
+
+exclusion_slots:
+  manic_hypomanic_episode:
+    type: boolean
+    signals: ["mania", "hypomania", "very high energy for days"]
+  substance_or_medical_cause:
+    type: boolean
+    signals: ["medication", "substance", "medical condition"]
+
+criteria:
+  core:
+    - id: A1
+      label: Depressed mood most of the day
+      slots_required: ["depressed_mood"]
+      rule: "depressed_mood == true"
+    - id: A2
+      label: Markedly diminished interest or pleasure
+      slots_required: ["anhedonia"]
+      rule: "anhedonia == true"
+    - id: D
+      label: Symptoms present at least 2 weeks
+      slots_required: ["duration_weeks"]
+      rule: "duration_weeks >= 2"
+    - id: S_count
+      label: Symptom count (5+ including depressed mood or anhedonia) — simplified
+      slots_required: ["appetite_weight_change","sleep_disturbance","psychomotor_change","fatigue","worthlessness_guilt","concentration","suicidality","depressed_mood","anhedonia"]
+      rule: "count_true([appetite_weight_change,sleep_disturbance,psychomotor_change,fatigue,worthlessness_guilt,concentration,suicidality,depressed_mood,anhedonia]) >= 5 and (depressed_mood==true or anhedonia==true)"
+  exclusions:
+    - id: X_mania
+      label: Manic/hypomanic episode present (rule-out)
+      slots_required: ["manic_hypomanic_episode"]
+      rule: "manic_hypomanic_episode == true"
+      effect: EXCLUDED
+    - id: X_substance_medical
+      label: Symptoms due to substance/medical condition (rule-out)
+      slots_required: ["substance_or_medical_cause"]
+      rule: "substance_or_medical_cause == true"
+      effect: EXCLUDED
+thresholds:
+  probable_min_core_met: 3
+  probable_min_coverage: 0.70
+notes:
+  template: true
+  todo: "Extend with full DSM text from the provided PDF if needed."

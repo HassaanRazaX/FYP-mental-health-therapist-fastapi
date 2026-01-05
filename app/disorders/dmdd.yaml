@@ -1,0 +1,96 @@
+id: dmdd
+name: Disruptive Mood Dysregulation Disorder
+category: depressive_disorders
+gating:
+  age_min: 6
+  age_max: 18
+interaction_requirements:
+  min_turns: 6
+  require_progress_summary: true
+  require_closure_ack: true
+
+slots:
+  outburst_severe:
+    type: boolean
+    signals: ["temper outburst", "yelling", "physical aggression", "rage"]
+  outburst_disproportionate:
+    type: boolean
+    signals: ["out of proportion", "too intense", "overreact"]
+  outburst_freq_per_week:
+    type: number
+    signals: ["times per week", "often", "frequently"]
+  irritable_between:
+    type: boolean
+    signals: ["irritable between", "angry most of day", "persistently angry"]
+  duration_months:
+    type: number
+    signals: ["months", "year", "since"]
+  symptom_free_gap_months:
+    type: number
+    signals: ["break", "symptom free", "gap"]
+  settings_count:
+    type: number
+    signals: ["home", "school", "with friends", "settings"]
+  severe_in_one_setting:
+    type: boolean
+    signals: ["severe at home", "severe at school"]
+  age_now:
+    type: number
+    signals: ["I am", "years old", "age"]
+  onset_age:
+    type: number
+    signals: ["started when", "since age"]
+
+exclusion_slots:
+  bipolar_dx:
+    type: boolean
+    signals: ["bipolar diagnosis"]
+  substance_or_medical_cause:
+    type: boolean
+    signals: ["medication", "substance", "medical condition"]
+
+criteria:
+  core:
+    - id: A
+      label: Severe recurrent temper outbursts out of proportion
+      slots_required: ["outburst_severe", "outburst_disproportionate"]
+      rule: "outburst_severe == true and outburst_disproportionate == true"
+    - id: C
+      label: Outbursts occur 3+ times/week
+      slots_required: ["outburst_freq_per_week"]
+      rule: "outburst_freq_per_week >= 3"
+    - id: D
+      label: Persistently irritable/angry between outbursts
+      slots_required: ["irritable_between"]
+      rule: "irritable_between == true"
+    - id: E
+      label: Duration 12+ months and no 3+ month symptom-free gap
+      slots_required: ["duration_months", "symptom_free_gap_months"]
+      rule: "duration_months >= 12 and symptom_free_gap_months < 3"
+    - id: F
+      label: Present in 2+ settings and severe in at least one
+      slots_required: ["settings_count", "severe_in_one_setting"]
+      rule: "settings_count >= 2 and severe_in_one_setting == true"
+    - id: G
+      label: Age 6-18
+      slots_required: ["age_now"]
+      rule: "age_now >= 6 and age_now <= 18"
+    - id: H
+      label: Onset before age 10
+      slots_required: ["onset_age"]
+      rule: "onset_age < 10"
+  exclusions:
+    - id: X_bipolar_dx
+      label: Bipolar disorder diagnosis (rule-out)
+      slots_required: ["bipolar_dx"]
+      rule: "bipolar_dx == true"
+      effect: EXCLUDED
+    - id: X_substance_medical
+      label: Symptoms due to substance/medical condition (rule-out)
+      slots_required: ["substance_or_medical_cause"]
+      rule: "substance_or_medical_cause == true"
+      effect: EXCLUDED
+
+thresholds:
+  probable_min_core_met: 5
+  probable_min_coverage: 0.75
